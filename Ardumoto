@@ -1,0 +1,176 @@
+/*
+ * Ardumoto Code
+ * 
+ * 1/17/2020
+ */
+ 
+ // Variables for control switches
+int input1 = 9;
+int input2 = 10;
+int input1State = 0;
+int input2State = 0;
+
+// Variables for motors
+int dirA = 12;
+int pwmA = 3;
+int dirB = 13;
+int pwmB = 11;
+
+// Status indicators
+int standbyLED = 5;
+int forwardLED = 6;
+int reverseLED = 7;
+int turnLED = 8;
+
+// Infrared sensors
+
+
+void setup() {
+  
+Serial.begin(9600);
+
+// Motor controller
+pinMode(pwmA, OUTPUT);
+pinMode(pwmB, OUTPUT);
+pinMode(dirA, OUTPUT);
+pinMode(dirB, OUTPUT);
+
+// Switches
+pinMode(input1, INPUT);
+pinMode(input2, INPUT);
+
+// Status indicators
+pinMode(standbyLED, OUTPUT);
+pinMode(forwardLED, OUTPUT);
+pinMode(reverseLED, OUTPUT);
+pinMode(turnLED, OUTPUT);
+}
+
+void loop() {
+  
+// Getting state
+input1State = digitalRead(input1);
+input2State = digitalRead(input2);
+
+// 00 - Sit
+if (input2State == LOW && input1State == LOW) {
+  // Turn on standby led
+  digitalWrite(standbyLED, HIGH);
+  // Turn off forward led
+  digitalWrite(forwardLED, LOW);
+  // Turn off reverse led
+  digitalWrite(reverseLED, LOW);
+  // Turn off turn led
+  digitalWrite(turnLED, LOW);
+  //Turn ooff standby led
+  digitalWrite(standbyLED, LOW);
+  // Motor power to 0
+  analogWrite(pwmA, 0);
+  analogWrite(pwmB, 0);
+
+  // Update serial moniter
+  Serial.println("Status: standby...");
+  delay(1000);
+}
+
+// 01 - Straight and speed
+else if (input2State == LOW && input1State == HIGH){
+  //Turn off standby led
+  digitalWrite(standbyLED, LOW);
+  // Turn on forward led
+  digitalWrite(forwardLED, HIGH);
+  // Turn off reverse led
+  digitalWrite(reverseLED, LOW);
+  // Turn off turn led
+  digitalWrite(turnLED, LOW);
+
+// Set both directions to high so it drives forward
+digitalWrite(dirA, HIGH);
+digitalWrite(dirB, HIGH);
+
+// Motor power 0.20m/s for 10 seconds
+analogWrite(pwmA, 255);
+analogWrite(pwmB, 255);
+delay(10000);
+// Motor power 0.4m/s for 5 seconds
+analogWrite(pwmA, 150);
+analogWrite(pwmB, 150);
+delay(5000);
+// Motor power 0.20m/s for 10 seconds
+analogWrite(pwmA, 255);
+analogWrite(pwmB, 255);
+delay(10000);
+// Motor power 0.4m/s for 5 seconds
+analogWrite(pwmA, 150);
+analogWrite(pwmB, 150);
+delay(5000);
+
+// Update serial moniter
+Serial.println("Status: moving forward...");
+}
+
+// 10 - Pivot and turn
+else if(input2State == HIGH && input1State == LOW){
+   // Turn off standby led
+  digitalWrite(standbyLED, LOW);
+  // Turn off forward led
+  digitalWrite(forwardLED, LOW);
+  // Turn off reverse led
+  digitalWrite(reverseLED, LOW);
+  // Turn on turn led
+  digitalWrite(turnLED, HIGH);
+
+// Set one direction low and one high so that it spins
+digitalWrite(dirA, HIGH);
+digitalWrite(dirB, LOW);
+// Motor power low (150)
+analogWrite(pwmA, 150);
+analogWrite(pwmB, 150);
+delay(1000);
+
+// Spin the other direction
+digitalWrite(dirA, LOW);
+digitalWrite(dirB, HIGH);
+// Motor power low (150)
+analogWrite(pwmA, 150);
+analogWrite(pwmB, 150);
+delay(1000);
+
+// Turn 90 degrees
+digitalWrite(dirA, HIGH);
+// Motor power to one wheel
+analogWrite(pwmA, 150);
+analogWrite(pwmB, 0);
+delay(1000);
+
+// Turn -90 degrees
+digitalWrite(dirA, LOW);
+// Motor power to one wheel
+analogWrite(pwmA, 150);
+analogWrite(pwmB, 0);
+delay(1000);
+
+// Turn 90 degrees
+digitalWrite(dirB, HIGH);
+// Motor power to one wheel
+analogWrite(pwmA, 0);
+analogWrite(pwmB, 150);
+delay(1000);
+
+// Turn -90 degrees
+digitalWrite(dirB, LOW);
+// Motor power to one wheel
+analogWrite(pwmA, 0);
+analogWrite(pwmB, 150);
+delay(1000);
+
+// Update serial moniter
+Serial.println("Status: turning...");
+delay(1000);
+}
+
+// 11 - Follow the wall
+else if(input2State == HIGH && input1State == HIGH){
+  
+}
+}
