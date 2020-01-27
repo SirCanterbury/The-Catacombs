@@ -23,7 +23,8 @@ int reverseLED = 7;
 int turnLED = 8;
 
 // Infrared sensors
-
+int IRsensorPin = A0;
+int IRsensorValue = 0;
 
 void setup() {
   
